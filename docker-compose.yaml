@@ -1,0 +1,31 @@
+services:
+  ollama:
+    image: ollama/ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    ports:
+      - "23000:8080"
+    volumes:
+      - open-webui:/app/backend/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: always
+    depends_on:
+      - searxng
+  searxng:
+    image: searxng/searxng
+    container_name: searxng
+    ports:
+      - "8080:8080"
+    volumes:
+      - "./searxng:/etc/searxng"
+    environment:
+      - "BASE_URL=http://0.0.0.0:8080/"
+      - "INSTANCE_NAME=SEARXNG"
+volumes:
+  ollama_models:
+  open-webui:
